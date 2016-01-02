@@ -464,10 +464,16 @@ namespace spades {
 				}
 				
 				// draw player's icon
+
+// >> Pastor's patch
+				float distance_min = 2048; // Default
+				Player *alarm_player = NULL;
+// << Pastor's patch
+
 				for(int i = 0; i < world->GetNumPlayerSlots(); i++){
 					Player * p = world->GetPlayer(i);
 					if(p == nullptr ||
-					   p->GetTeamId() != world->GetLocalPlayer()->GetTeamId() ||
+//					   p->GetTeamId() != world->GetLocalPlayer()->GetTeamId() ||
 					   !p->IsAlive())
 						continue;
 					
@@ -476,16 +482,37 @@ namespace spades {
 					if(player->GetTeamId() >= 2){
 						ang = client->followYaw - static_cast<float>(M_PI) * .5f;
 					}
-					
+
+					Vector3 me_pos = player->GetPosition();
+					Vector3 en_pos = p->GetPosition();
+					float distance = (me_pos - en_pos).GetChebyshevLength();
+					if ((distance < distance_min) && (p != player)) {
+						distance_min = distance;
+						alarm_player = p;
+					}
+
 					//use a spec color for each player
 					if ( colormode=="1"){
-						IntVector3 Colorplayer=IntVector3::Make(palette[i][0],palette[i][1],palette[i][2]);
-						Vector4 ColorplayerF = ModifyColor(Colorplayer);
-						ColorplayerF *=1.0f;
-						renderer->SetColorAlphaPremultiplied(ColorplayerF);
+// FIXME: add 'ifdefs' or configurable variable to distinguish old and new modes
+// Old mode:
+//						IntVector3 Colorplayer=IntVector3::Make(palette[i][0],palette[i][1],palette[i][2]);
+//						Vector4 ColorplayerF = ModifyColor(Colorplayer);
+//						ColorplayerF *=1.0f;
+//						renderer->SetColorAlphaPremultiplied(ColorplayerF);
+// >> Pastor's patch
+						IntVector3 teamColor = world->GetTeam(p->GetTeamId()).color;
+						teamColorF = ModifyColor(teamColor);
+						renderer->SetColorAlphaPremultiplied(teamColorF);
+// << Pastor's patch
 					}	
 					else {
+// >> Pastor's patch
+						IntVector3 teamColor = world->GetTeam(p->GetTeamId()).color;
+						teamColorF = ModifyColor(teamColor);
 						renderer->SetColorAlphaPremultiplied(teamColorF);
+// << Pastor's patch
+// Old mode:
+//						renderer->SetColorAlphaPremultiplied(teamColorF);
 					}
 					
 					//use a different icon in minimap according to weapon of player
@@ -515,6 +542,9 @@ namespace spades {
 								p->GetPosition(), playerIcon, ang);
 					}
 				}
+
+//Pastor's patch
+				client->DrawPos(alarm_player, Vector2(renderer->ScreenWidth() - 350, renderer->ScreenHeight() - 120), true);
 			}
 			
 			IGameMode* mode = world->GetMode();

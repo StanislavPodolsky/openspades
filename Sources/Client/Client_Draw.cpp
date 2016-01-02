@@ -556,6 +556,7 @@ namespace spades {
 				mapView->Draw();
 				
 				DrawHealth();
+				DrawPos(p, Vector2(scrWidth - 350, scrHeight - 150), false);
 					
 					
 			}
@@ -726,6 +727,36 @@ namespace spades {
 			font->DrawShadow(str, pos, 1.f, numberColor, MakeVector4(0,0,0,0.5));
 		}
 		
+		//Pastor's patch
+
+
+		void Client::DrawPos(Player *p, Vector2 pos, bool isEnemy) {
+			SPADES_MARK_FUNCTION();
+
+			if (!p)
+				return;
+
+			std::string str;
+
+			str = isEnemy ? "Enemy:" : "X-Y-Z:";
+			str += " x=" + std::to_string(p->GetPosition().x) + " y=" + std::to_string(p->GetPosition().z) + " z=" + std::to_string(p->GetPosition().y);
+
+			IFont *font = textFont;
+			float margin = 2.f;
+
+			IRenderer *r = renderer;
+			auto size = font->Measure(str);
+			size += Vector2(margin * 2.f, margin * 2.f);
+
+			auto position = (Vector2(pos.x, pos.y));
+
+			r->SetColorAlphaPremultiplied(Vector4(0.f, 0.f, 0.f, 0.5f));
+			r->DrawImage(nullptr, AABB2(pos.x, pos.y, size.x, size.y));
+			font->DrawShadow(str, position + Vector2(margin, margin), 1.f,
+				Vector4(1.f, 1.f, 1.f, 1.f),
+				Vector4(0.f, 0.f, 0.f, 0.5f));
+		}
+
 		void Client::Draw2DWithWorld() {
 			SPADES_MARK_FUNCTION();
 			

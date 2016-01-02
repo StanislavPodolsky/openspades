@@ -270,6 +270,8 @@ namespace spades {
 			void DrawHurtScreenEffect();
 			void DrawHurtSprites();
 			void DrawHealth();
+			// PASTOR's patch
+			void DrawPos(Player *player, Vector2 pos, bool isEnemy);
 			void DrawAlert();
 			void DrawDebugAim();
 			void DrawStats();
@@ -298,7 +300,9 @@ namespace spades {
 		public:
 			Client(IRenderer *, IAudioDevice *,
 				   const ServerAddress& host, std::string playerName);
-			
+			// Pastor's patch
+			bool isFirstSpawn;
+
 			virtual void RunFrame(float dt);
 			
 			virtual void Closing();
@@ -387,6 +391,10 @@ namespace spades {
 			virtual void LocalPlayerHurt(HurtType type, bool sourceGiven,
 										 Vector3 source);
 			virtual void LocalPlayerBuildError(BuildFailureReason reason);
+			// Pastor's patch
+			virtual void VotekickEnemyPlayer();
+			virtual void KilledOrDemisedMsg(Player *killer, Player *victim, bool wasKilled);
+
 		};
 	}
 }

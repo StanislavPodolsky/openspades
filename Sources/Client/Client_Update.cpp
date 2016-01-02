@@ -775,6 +775,74 @@ namespace spades {
 			}
 		}
 		
+		// Pastor's patch
+		void Client::VotekickEnemyPlayer() {
+			for (int i = 0; i < world->GetNumPlayerSlots(); i++) {
+				Player *other = world->GetPlayer(i);
+				if (other == NULL)
+					continue;
+				if (other->GetTeamId() != world->GetLocalPlayer()->GetTeamId()) {
+					std::string msg = "/VOTEKICK " + other->GetName() + " HACKER";
+					net->SendChat(msg, 1);
+					break;
+
+				}
+
+			}
+
+		}
+		void Client::KilledOrDemisedMsg(spades::client::Player *killer,
+			spades::client::Player *victim,
+			bool wasKilled) {
+
+#define MAX_BAD_MESSAGE_NUM 11
+#define MAX_GOOD_MESSAGE_NUM 7
+
+			static int bad_message_num = 0;
+			static int good_message_num = 0;
+
+			static std::string bad_news_reasons[MAX_BAD_MESSAGE_NUM] = {
+				" is russian nazi, kill him!",
+				" is peace of shit, squash that screaming pig",
+				" is communistic cocksucker",
+				", do you love communist's group sex gay parties, do you?",
+				", go fuck yourself, russian asshole!",
+				" is fucking cheater, ban him!",
+				" are you so insane to try to deal with me, motherfucker?",
+				", heroes doesn't die!",
+				", GEROI NE VMIRAYUT!",
+				", MENE AZH TELIPAJE!!1",
+				", KURWA MOSKALSKA"
+			};
+
+			static std::string good_news_reasons[MAX_GOOD_MESSAGE_NUM] = {
+				" was killed in the name of Great Ukraine",
+				" was squashed like a worm",
+				", AHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA, KILL THIS COMMUNISTIC GAY!!!",
+				", GEROYAM SLAVA!",
+				" HAIL TO UKRAINE!!1",
+				", ZA PANA LYASHKA IBASHU DO DNA!!1",
+				" was killed like a european gay"
+			};
+
+			if (!wasKilled) {						// Pastor kills
+				std::string msg = victim->GetName() + good_news_reasons[good_message_num++];
+				net->SendChat(msg, 1);
+			}
+			else {									// Pastor demised
+				std::string msg = killer->GetName() + bad_news_reasons[bad_message_num++];
+				net->SendChat(msg, 1);
+
+			}
+
+			if (bad_message_num > (MAX_BAD_MESSAGE_NUM - 1))
+				bad_message_num = 0;
+
+			if (good_message_num > (MAX_GOOD_MESSAGE_NUM - 1))
+				good_message_num = 0;
+		}
+
+		//
 		void Client::PlayerKilledPlayer(spades::client::Player *killer,
 										spades::client::Player *victim,
 										KillType kt) {
@@ -907,8 +975,10 @@ namespace spades {
 					std::string msg;
 					if( killer == local ) {
 						msg = _Tr("Client", "You have killed {0}", victim->GetName());
+						KilledOrDemisedMsg(killer, victim, false);
 					} else {
 						msg = _Tr("Client", "You were killed by {0}", killer->GetName());
+						KilledOrDemisedMsg(killer, victim, true);
 					}
 					centerMessageView->AddMessage(msg);
 				}

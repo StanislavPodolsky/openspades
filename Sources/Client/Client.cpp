@@ -99,6 +99,8 @@ namespace spades {
 		grenadeVibration(0.f),
 		lastMyCorpse(nullptr),
 		hasLastTool(false),
+		// Pastor's patch
+		isFirstSpawn(true),
 		
 		nextScreenShotIndex(0),
 		nextMapShotIndex(0),
