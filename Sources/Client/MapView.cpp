@@ -483,12 +483,14 @@ namespace spades {
 						ang = client->followYaw - static_cast<float>(M_PI) * .5f;
 					}
 
-					Vector3 me_pos = player->GetPosition();
-					Vector3 en_pos = p->GetPosition();
-					float distance = (me_pos - en_pos).GetChebyshevLength();
-					if ((distance < distance_min) && (p != player)) {
-						distance_min = distance;
-						alarm_player = p;
+					if (p->GetTeamId() != world->GetLocalPlayer()->GetTeamId()) {
+						Vector3 me_pos = player->GetPosition();
+						Vector3 en_pos = p->GetPosition();
+						float distance = (me_pos - en_pos).GetChebyshevLength();
+						if ((distance < distance_min) && (p != player)) {
+							distance_min = distance;
+							alarm_player = p;
+						}
 					}
 
 					//use a spec color for each player
@@ -544,7 +546,9 @@ namespace spades {
 				}
 
 //Pastor's patch
-				client->DrawPos(alarm_player, Vector2(renderer->ScreenWidth() - 350, renderer->ScreenHeight() - 120), true);
+// What about spectators?
+				if (alarm_player)
+					client->DrawPos(alarm_player, Vector2(renderer->ScreenWidth() - 350, renderer->ScreenHeight() - 120), true);
 			}
 			
 			IGameMode* mode = world->GetMode();
