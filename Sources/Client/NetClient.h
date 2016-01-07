@@ -31,6 +31,7 @@
 #include "Player.h"
 #include <Core/Stopwatch.h>
 #include <memory>
+#include <regex>
 
 struct _ENetHost;
 struct _ENetPeer;

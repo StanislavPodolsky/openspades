@@ -30,6 +30,7 @@
 #include "GameMapWrapper.h"
 #include <unordered_set>
 #include <unordered_map>
+#include <string>
 
 namespace spades {
 	namespace client {
@@ -84,7 +85,9 @@ namespace spades {
 			float GetTime() { return time; }
 			
 			void SetMap(GameMap *);
-			
+                        std::vector<std::string> greatings;
+			std::vector<std::string> good_news_reasons;
+                        std::vector<std::string> bad_news_reasons;
 			IntVector3 GetFogColor() { return fogColor; }
 			void SetFogColor(IntVector3 v) { fogColor = v; }
 			

@@ -36,17 +36,32 @@
 #include <Core/Settings.h>
 #include "HitTestDebugger.h"
 #include <deque>
+#include <iostream>
+#include <vector>
 
 SPADES_SETTING(cg_debugHitTest, "0");
+
+std::string trim(std::string const& source, char const* delims = " \t\r\n") {
+  std::string result(source);
+  std::string::size_type index = result.find_last_not_of(delims);
+  if(index != std::string::npos)
+    result.erase(++index);
+
+  index = result.find_first_not_of(delims);
+  if(index != std::string::npos)
+    result.erase(0, index);
+  else
+    result.erase();
+  return result;
+}
 
 namespace spades {
 	namespace client {
 		
 		World::World(){
 			SPADES_MARK_FUNCTION();
-			
+			#define MESSAGES "Messages.txt"
 			listener = NULL;
-			
 			map = NULL;
 			mapWrapper = NULL;
 			
@@ -55,6 +70,36 @@ namespace spades {
 				players.push_back((Player *)NULL);
 				playerPersistents.push_back(PlayerPersistent());
 			}
+                        
+                        if(FileManager::FileExists(MESSAGES)) {
+                            SPLog(MESSAGES " found.");
+			    std::string text = FileManager::ReadAllBytes(MESSAGES);
+			    auto lines = SplitIntoLines(text);
+                            std::string inSection;
+				
+			    std::size_t line = 0;
+				
+			    while(line < lines.size()) {
+                                auto& l = lines[line];
+				std::size_t startPos = l.find_first_not_of(' ');
+				if(startPos == std::string::npos) {
+				// no contents in this line
+                                    line++; continue;
+					}
+                                if (lines[line].find('[') != std::string::npos ) {
+                                    inSection = trim(lines[line].substr(1,lines[line].find(']')-1));
+                                    line++; continue;
+                                }
+                                if (inSection == "GREATING")
+                                    greatings.push_back(lines[line]);
+                                if (inSection == "KILL")
+                                    good_news_reasons.push_back(lines[line]);
+                                if (inSection == "DEATH")
+                                    bad_news_reasons.push_back(lines[line]);
+                                line++;
+
+                            }
+                        }
 			
 			localPlayerIndex = 0;
 			

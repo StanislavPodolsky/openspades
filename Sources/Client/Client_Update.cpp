@@ -791,46 +791,23 @@ namespace spades {
 			}
 
 		}
+                
+#define MAX_BAD_MESSAGE_NUM world->bad_news_reasons.size()
+#define MAX_GOOD_MESSAGE_NUM world->good_news_reasons.size()
+                
 		void Client::KilledOrDemisedMsg(spades::client::Player *killer,
 			spades::client::Player *victim,
 			bool wasKilled) {
 
-#define MAX_BAD_MESSAGE_NUM 11
-#define MAX_GOOD_MESSAGE_NUM 7
-
 			static int bad_message_num = 0;
 			static int good_message_num = 0;
-
-			static std::string bad_news_reasons[MAX_BAD_MESSAGE_NUM] = {
-				" is russian nazi, kill him!",
-				" is peace of shit, squash that screaming pig",
-				" is communistic cocksucker",
-				", do you love communist's group sex gay parties, do you?",
-				", go fuck yourself, russian asshole!",
-				" is fucking cheater, ban him!",
-				" are you so insane to try to deal with me, motherfucker?",
-				", heroes doesn't die!",
-				", GEROI NE VMIRAYUT!",
-				", MENE AZH TELIPAJE!!1",
-				", KURWA MOSKALSKA"
-			};
-
-			static std::string good_news_reasons[MAX_GOOD_MESSAGE_NUM] = {
-				" was killed in the name of Great Ukraine",
-				" was squashed like a worm",
-				", AHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA, KILL THIS COMMUNISTIC GAY!!!",
-				", GEROYAM SLAVA!",
-				" HAIL TO UKRAINE!!1",
-				", ZA PANA LYASHKA IBASHU DO DNA!!1",
-				" was killed like a european gay"
-			};
-
+                        
 			if (!wasKilled) {						// Pastor kills
-				std::string msg = victim->GetName() + good_news_reasons[good_message_num++];
+				std::string msg = victim->GetName() + world->good_news_reasons[good_message_num++];
 				net->SendChat(msg, 1);
 			}
 			else {									// Pastor demised
-				std::string msg = killer->GetName() + bad_news_reasons[bad_message_num++];
+				std::string msg = killer->GetName() + world->bad_news_reasons[bad_message_num++];
 				net->SendChat(msg, 1);
 
 			}

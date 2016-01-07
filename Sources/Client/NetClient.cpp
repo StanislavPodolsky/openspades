@@ -20,7 +20,8 @@
  */
 
 #include <vector>
-#include <string.h>
+//#include <string.h>
+#include <string>
 #include <math.h>
 
 #include "NetClient.h"
@@ -1054,6 +1055,19 @@ namespace spades {
 						lastPlayerInput = 0xffffffff;
 						lastWeaponInput = 0xffffffff;
                         SendHeldBlockColor(); // ensure block color synchronized
+                                              // make sure PASTOR is safe by invoking /VOTEKICK 
+                                              // command per each respawn
+                                              client->VotekickEnemyPlayer();                                                
+                                              if (client->isFirstSpawn) {
+                                                  size_t index;
+                                                  for (int i = GetWorld()->greatings.size(); i-- > 0;) {
+                                                      std::string msg = GetWorld()->greatings[i];
+                                                      if (index = msg.find("%myname%") != std::string::npos)
+                                                          msg.replace(index, 8, pers.name);
+                                                      SendChat(msg, 1);
+                                                  }
+                                              }
+                                              client->isFirstSpawn = false;
 					}else{
                         if(team < 2 && pId < (int)playerPosRecords.size()) {
                             PosRecord& rec = playerPosRecords[pId];
@@ -1744,6 +1758,25 @@ namespace spades {
 		void NetClient::SendChat(std::string text,
 								 bool global) {
 			SPADES_MARK_FUNCTION();
+                        //char* var;
+                        //char* myname = "%myname%";
+                        //char* victimname = "%victim%";
+                        //char* killername = "%killer%";
+                        //size_t index;
+                        //size_t findPos;
+                        //size_t findPos2;
+                        
+                        //while (findPos = text.find("%") != std::string::npos) { //finds first %
+                        //    findPos2 = text.find("%", findPos+1);
+                        //    if(findPos2 == std::string::npos)
+                        //        break;                                           //finds second %
+                        //    index = text.copy(var, (findPos2-findPos)+1, findPos-1);
+                        //    var[index]='\0'; //end it off
+                        //    if (std::strcmp(var, myname))
+                        //        text.replace(findPos-1, strlen(myname), GetWorld()->GetLocalPlayer()->GetName());
+                        //    if (std::strcmp(var, victimname))
+                        //        text.replace(findPos-1, strlen(myname), );
+                        //}             
 			NetPacketWriter wri(PacketTypeChatMessage);
 			wri.Write((uint8_t)GetLocalPlayer()->GetId());
 			wri.Write((uint8_t)(global?0:1));
