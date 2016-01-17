@@ -50,6 +50,7 @@ namespace spades {
 							rnd = 0;
 					}
 				}
+			wallHackEnable = 0;
 		}
 		GameMap::~GameMap(){
 			SPADES_MARK_FUNCTION();

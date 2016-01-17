@@ -69,6 +69,8 @@ namespace spades {
 			}
 			
 			void RealizeChunks(Vector3 eye);
+			//Pastor's patch
+			void PastorRealizeChunks(Vector3 eye);
 			
 			void DrawColumnSunlight(int cx, int cy, int cz, Vector3 eye);
 			void DrawColumnDLight(int cx, int cy, int cz, Vector3 eye, const std::vector<GLDynamicLight>& lights);

@@ -148,7 +148,21 @@ namespace spades {
 					chunks[i]->SetRealized(false);
 			}
 		}
-		
+	
+	//Pastor's patch
+	void GLMapRenderer::PastorRealizeChunks(spades::Vector3 eye) {
+			SPADES_MARK_FUNCTION();
+			
+			float cullDistance = 10;
+			float releaseDistance = 15;
+			for(int i = 0; i < numChunks; i++){
+				float dist = chunks[i]->DistanceFromEye(eye);
+				chunkInfos[i].distance = dist;
+				if(dist < cullDistance)
+					chunks[i]->SetNeedsUpdate();
+			}
+		}
+
 		void GLMapRenderer::Prerender() {
 			SPADES_MARK_FUNCTION();
 			

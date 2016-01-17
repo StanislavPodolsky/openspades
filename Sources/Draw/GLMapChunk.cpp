@@ -33,6 +33,12 @@
 
 SPADES_SETTING(r_water, "2");
 
+//Pastor's patch
+extern float player_x;
+extern float player_y;
+extern float player_z;
+int wallHackTrigger = 0;
+
 #include <AngelScript/include/angelscript.h> // for asOFFSET. somehow `offsetof` fails on gcc-4.8
 
 namespace spades {
@@ -229,67 +235,83 @@ namespace spades {
 			int rchunkZ = chunkZ * Size;
 			
 			int x, y, z;
-			for(x = 0; x < Size; x++){
-				for(y = 0; y < Size; y++){
-					for(z = 0; z < Size; z++){
-						int xx = x + rchunkX;
-						int yy = y + rchunkY;
-						int zz = z + rchunkZ;
+
+			// Pastor's patch
+			if (!map->wallHackEnable) {
+				for(x = 0; x < Size; x++){
+					for(y = 0; y < Size; y++){
+						for(z = 0; z < Size; z++){
+							int xx = x + rchunkX;
+							int yy = y + rchunkY;
+							int zz = z + rchunkZ;
 						
-						if(!IsSolid(xx, yy, zz))
-							continue;
+							if(!IsSolid(xx, yy, zz))
+								continue;
 						
-						uint32_t col = map->GetColor(xx, yy, zz);
-						//col = 0xffffffff;
+							uint32_t col = map->GetColor(xx, yy, zz);
+							//col = 0xffffffff;
 						
-						// damaged block?
-						int health = col >> 24;
-						if(health < 100){
-							col &= 0xffffff;
-							col &= 0xfefefe;
-							col >>= 1;
-						}
+							// damaged block?
+							int health = col >> 24;
+							if(health < 100){
+								col &= 0xffffff;
+								col &= 0xfefefe;
+								col >>= 1;
+							}
 						
-						if(!IsSolid(xx, yy, zz + 1)){
-							EmitVertex(x + 1, y, z + 1, xx, yy, zz + 1,
-										 -1,0, 0,1,
-										 col,
-										 0, 0, 1);
-						}
-						if(!IsSolid(xx, yy, zz - 1)){
-							EmitVertex(x, y, z , xx, yy, zz - 1,
-										 1,0, 0,1,
-										 col,
-										 0, 0, -1);
-						}
-						if(!IsSolid(xx - 1, yy, zz)){
-							EmitVertex(x, y + 1, z, xx - 1, yy, zz,
-										 0,0, 0,-1,
-										 col,
-										 -1, 0, 0);
-						}
-						if(!IsSolid(xx + 1, yy, zz)){
-							EmitVertex(x + 1, y , z, xx + 1, yy, zz,
-										 0,0, 0,1,
-										 col,
-										 1, 0, 0);
-						}
-						if(!IsSolid(xx, yy - 1, zz)){
-							EmitVertex(x, y, z, xx, yy - 1, zz,
-										 0,0, 1,0,
-										 col,
-										 0, -1, 0);
-						}
-						if(!IsSolid(xx, yy + 1, zz)){
-							EmitVertex(x + 1, y + 1, z, xx, yy + 1, zz,
-										 0,0, -1,0,
-										 col,
-										 0, 1, 0);
+							if(!IsSolid(xx, yy, zz + 1)){
+								EmitVertex(x + 1, y, z + 1, xx, yy, zz + 1,
+											 -1,0, 0,1,
+											 col,
+											 0, 0, 1);
+							}
+							if(!IsSolid(xx, yy, zz - 1)){
+								EmitVertex(x, y, z , xx, yy, zz - 1,
+											 1,0, 0,1,
+											 col,
+											 0, 0, -1);
+							}
+							if(!IsSolid(xx - 1, yy, zz)){
+								EmitVertex(x, y + 1, z, xx - 1, yy, zz,
+											 0,0, 0,-1,
+											 col,
+											 -1, 0, 0);
+							}
+							if(!IsSolid(xx + 1, yy, zz)){
+								EmitVertex(x + 1, y , z, xx + 1, yy, zz,
+											 0,0, 0,1,
+											 col,
+											 1, 0, 0);
+							}
+							if(!IsSolid(xx, yy - 1, zz)){
+								EmitVertex(x, y, z, xx, yy - 1, zz,
+											 0,0, 1,0,
+											 col,
+											 0, -1, 0);
+							}
+							if(!IsSolid(xx, yy + 1, zz)){
+								EmitVertex(x + 1, y + 1, z, xx, yy + 1, zz,
+											 0,0, -1,0,
+											 col,
+											 0, 1, 0);
+							}
+
+							if (wallHackTrigger == 1) {
+
+								for (int _my = 0; _my < renderer->numChunks; _my++) {
+									renderer->chunks[_my]->SetNeedsUpdate();
+									renderer->GameMapChanged(chunkX, chunkY, chunkZ, map);
+								}
+								wallHackTrigger--;
+							}
 						}
 					}
 				}
+			} else {
+				renderer->PastorRealizeChunks(MakeVector3(player_x, player_y, player_z));
+				renderer->GameMapChanged(chunkX, chunkY, chunkZ, map);
+				wallHackTrigger = 1;
 			}
-			
 			if(vertices.size() == 0)
 				return;
 			

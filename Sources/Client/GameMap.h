@@ -45,6 +45,9 @@ namespace spades{
 				DefaultDepth = 64 // should be <= 64
 			};
 			GameMap();
+
+			//Pastor's patch
+			bool wallHackEnable;
 			
 			static GameMap *Load(IStream *);
 			

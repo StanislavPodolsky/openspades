@@ -38,6 +38,8 @@
 
 #include "NetClient.h"
 
+// Pastor's patch
+#include "GameMap.h"
 
 SPADES_SETTING(cg_mouseSensitivity, "1");
 SPADES_SETTING(cg_zoomedMouseSensScale, "0.6");
@@ -56,7 +58,9 @@ SPADES_SETTING(cg_keyToolGrenade, "4");
 SPADES_SETTING(cg_keyReloadWeapon, "r");
 SPADES_SETTING(cg_keyFlashlight, "f");
 SPADES_SETTING(cg_keyLastTool, "");
-
+//Pastor's patch
+SPADES_SETTING(cg_wallHack, "`");
+//
 SPADES_SETTING(cg_keyMoveLeft, "a");
 SPADES_SETTING(cg_keyMoveRight, "d");
 SPADES_SETTING(cg_keyMoveForward, "w");
@@ -483,6 +487,11 @@ namespace spades {
 							hasLastTool = false;
 							SetSelectedTool(lastTool);
 						}
+
+					}
+					//Pastor's patch
+					else if(CheckKey(cg_wallHack, name) && down){
+						world->GetMap()->wallHackEnable = 1 - world->GetMap()->wallHackEnable;
 					}else if(CheckKey(cg_keyGlobalChat, name) && down){
 						// global chat
 						scriptedUI->EnterGlobalChatWindow();

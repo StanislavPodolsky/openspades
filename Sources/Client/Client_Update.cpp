@@ -952,10 +952,10 @@ namespace spades {
 					std::string msg;
 					if( killer == local ) {
 						msg = _Tr("Client", "You have killed {0}", victim->GetName());
-						KilledOrDemisedMsg(killer, victim, false);
+//						KilledOrDemisedMsg(killer, victim, false);
 					} else {
 						msg = _Tr("Client", "You were killed by {0}", killer->GetName());
-						KilledOrDemisedMsg(killer, victim, true);
+//						KilledOrDemisedMsg(killer, victim, true);
 					}
 					centerMessageView->AddMessage(msg);
 				}

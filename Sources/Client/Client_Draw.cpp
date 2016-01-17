@@ -56,6 +56,10 @@
 
 #include "NetClient.h"
 
+//Pastor's patch
+//FIXME: any proper place for this?
+float player_x, player_y, player_z;
+
 SPADES_SETTING(cg_hitIndicator, "1");
 SPADES_SETTING(cg_debugAim, "0");
 SPADES_SETTING(cg_keyReloadWeapon, "");
@@ -740,6 +744,11 @@ namespace spades {
 
 			str = isEnemy ? "Enemy:" : "X-Y-Z:";
 			str += " x=" + std::to_string(p->GetPosition().x) + " y=" + std::to_string(p->GetPosition().z) + " z=" + std::to_string(p->GetPosition().y);
+
+//Pastor's patch
+			player_x = p->GetPosition().x;
+			player_y = p->GetPosition().y;
+			player_z = p->GetPosition().z;
 
 			IFont *font = textFont;
 			float margin = 2.f;
